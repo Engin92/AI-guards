@@ -7,13 +7,15 @@ public class Guard : MonoBehaviour {
 	public static event System.Action OnGuardHasSpottedPlayer;
 
 	public float speed = 5;
-	public float waitTime = .3f;
+	public float waitTime = .5f;
 	public float turnSpeed = 90;
-	public float timeToSpotPlayer = .5f;
+	public float timeToSpotPlayer = 0.3f;
 
 	public Light spotlight;
 	public float viewDistance;
 	public LayerMask viewMask;
+	public bool spotted = false;
+	public bool disableGuard = false;
 
 	float viewAngle;
 	float playerVisibleTimer;
@@ -47,9 +49,14 @@ public class Guard : MonoBehaviour {
 		spotlight.color = Color.Lerp (originalSpotlightColour, Color.red, playerVisibleTimer / timeToSpotPlayer);
 
 		if (playerVisibleTimer >= timeToSpotPlayer) {
-			if (OnGuardHasSpottedPlayer != null) {
-				OnGuardHasSpottedPlayer ();
-			}
+
+				spotted = true;
+				
+				if (Vector3.Distance(transform.position,player.position) < 1.5){
+					OnGuardHasSpottedPlayer();
+					disableGuard = true;
+				}
+			
 		}
 	}
 
@@ -73,7 +80,7 @@ public class Guard : MonoBehaviour {
 		Vector3 targetWaypoint = waypoints [targetWaypointIndex];
 		transform.LookAt (targetWaypoint);
 
-		while (true) {
+		while (!spotted) {
 			transform.position = Vector3.MoveTowards (transform.position, targetWaypoint, speed * Time.deltaTime);
 			if (transform.position == targetWaypoint) {
 				targetWaypointIndex = (targetWaypointIndex + 1) % waypoints.Length;
@@ -81,6 +88,13 @@ public class Guard : MonoBehaviour {
 				yield return new WaitForSeconds (waitTime);
 				yield return StartCoroutine (TurnToFace (targetWaypoint));
 			}
+			yield return null;
+		}
+		
+		while (spotted && !disableGuard) {
+			
+			transform.LookAt(player.position);
+			transform.position = Vector3.MoveTowards (transform.position, player.position , speed * Time.deltaTime);
 			yield return null;
 		}
 	}

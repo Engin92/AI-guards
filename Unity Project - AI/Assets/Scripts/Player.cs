@@ -6,7 +6,7 @@ public class Player : MonoBehaviour {
 
 	public event System.Action OnReachedEndOfLevel;
 
-	public float moveSpeed = 7;
+	public float moveSpeed = 6.5f;
 	public float smoothMoveTime = .1f;
 	public float turnSpeed = 8;
 
