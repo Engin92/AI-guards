@@ -1,2 +1,3 @@
 # AI-guards
-top down sneaking game with AI guards for knowledge and Representation course
+top down sneaking game with AI guards 
+development platform: unity engine
